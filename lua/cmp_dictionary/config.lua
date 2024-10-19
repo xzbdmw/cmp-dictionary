@@ -9,17 +9,17 @@ local is = u.is
 ---@field document { enable: boolean, command: string[] }
 ---@field external { enable: boolean, command: string[] }
 local default = {
-  paths = {},
-  exact_length = 2,
-  first_case_insensitive = false,
-  max_number_items = 0,
-  document = {
-    enable = false,
-    command = {},
-  },
+  paths = { "/usr/share/dict/words" },
+  exact_length = 0,
   external = {
-    enable = false,
-    command = {},
+    enable = true,
+    command = { "look", "${prefix}" },
+  },
+  max_number_items = 100,
+  first_case_insensitive = false,
+  document = {
+    enable = true,
+    command = { "wn", "${label}", "-over" },
   },
 }
 

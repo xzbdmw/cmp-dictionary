@@ -50,8 +50,20 @@ function source:_update()
 end
 
 ---@param request cmp.SourceCompletionApiParams
----@param callback fun(response: lsp.CompletionList)
+---@param callback fun(response: lsp.CompletionList) sunch
 function source:complete(request, callback)
+  local enable = false
+  if
+    require("cmp.config.context").in_treesitter_capture("comment")
+    or require("cmp.config.context").in_treesitter_capture("string")
+    or request.context.option.reason == "manual"
+  then
+    enable = true
+  end
+  if not enable then
+    callback({})
+    return
+  end
   local opts = config.options
   local req = request.context.cursor_before_line:sub(request.offset)
   local isIncomplete = false
@@ -60,7 +72,7 @@ function source:complete(request, callback)
     isIncomplete = #req < opts.exact_length
   end
 
-  -- Calls by cmp.complete ignore the keyword_length.
+  -- Calls by cmp.complete ignore the keyword_length. synch
   if request.keyword_length and #req < request.keyword_length then
     callback({ items = {}, isIncomplete = true })
     return
@@ -92,7 +104,7 @@ function source:complete(request, callback)
     items = vim.list_slice(items, 1, opts.max_number_items)
   end
 
-  callback({ items = items, isIncomplete = isIncomplete })
+  callback({ items = items, isIncomplete = true })
 end
 
 ---@param item lsp.CompletionItem

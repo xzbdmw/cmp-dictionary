@@ -31,7 +31,7 @@ function M:search(prefix)
     local output = util.system(command)
     for _, word in ipairs(output) do
       if word ~= "" then
-        table.insert(items, { label = word, info = info })
+        table.insert(items, { kind = 24, label = word, info = info })
       end
     end
   end
