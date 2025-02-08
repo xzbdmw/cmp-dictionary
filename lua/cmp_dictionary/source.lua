@@ -78,6 +78,12 @@ function source:complete(request, callback)
     return
   end
 
+  local function call(items)
+    if opts.max_number_items > 0 and #items > opts.max_number_items then
+      items = vim.list_slice(items, 1, opts.max_number_items)
+    end
+    callback({ items = items, isIncomplete = true })
+  end
   local items
   if opts.first_case_insensitive then
     if is_capital(req) then
@@ -86,7 +92,7 @@ function source:complete(request, callback)
         vim.tbl_map(function(item)
           item.label = capitalize(item.label)
           return item
-        end, self.dict:search(decapitalize(req)))
+        end, self.dict:search(decapitalize(req), call))
       )
     else
       items = vim.list_extend(
@@ -94,11 +100,11 @@ function source:complete(request, callback)
         vim.tbl_map(function(item)
           item.label = decapitalize(item.label)
           return item
-        end, self.dict:search(capitalize(req)))
+        end, self.dict:search(capitalize(req), call))
       )
     end
   else
-    items = self.dict:search(req)
+    items = self.dict:search(req, call)
   end
   if opts.max_number_items > 0 and #items > opts.max_number_items then
     items = vim.list_slice(items, 1, opts.max_number_items)

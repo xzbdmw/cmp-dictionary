@@ -21,19 +21,26 @@ end
 
 ---@param prefix string
 ---@return lsp.CompletionItem[]
-function M:search(prefix)
+function M:search(prefix, callback)
   local items = {}
   for _, path in ipairs(self.paths) do
     local command = vim.tbl_map(function(c)
       return c:gsub("${prefix}", prefix):gsub("${path}", path)
     end, self.command)
     local info = string.format("belong to `%s`", vim.fn.fnamemodify(path, ":t"))
-    local output = util.system(command)
-    for _, word in ipairs(output) do
-      if word ~= "" then
-        table.insert(items, { kind = 24, label = word, info = info })
+    vim.system(
+      { "sh", "-c", "cat /usr/share/dict/words | fzf --filter '" .. prefix .. "' | head -n 100" },
+      { text = true },
+      function(result)
+        local output = vim.split(result.stdout or "", "\n")
+        for _, word in ipairs(output) do
+          if word ~= "" then
+            table.insert(items, { kind = 24, label = word, info = info })
+          end
+        end
+        callback(items)
       end
-    end
+    )
   end
   return items
 end
