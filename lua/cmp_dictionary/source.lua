@@ -57,6 +57,7 @@ function source:complete(request, callback)
     require("cmp.config.context").in_treesitter_capture("comment")
     or require("cmp.config.context").in_treesitter_capture("string")
     or request.context.option.reason == "manual"
+    or vim.bo.filetype == "gitcommit"
   then
     enable = true
   end

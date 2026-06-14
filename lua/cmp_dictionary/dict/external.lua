@@ -22,6 +22,7 @@ end
 ---@param prefix string
 ---@return lsp.CompletionItem[]
 function M:search(prefix, callback)
+  prefix = vim.fn.tolower(prefix)
   local items = {}
   for _, path in ipairs(self.paths) do
     local command = vim.tbl_map(function(c)
@@ -29,7 +30,7 @@ function M:search(prefix, callback)
     end, self.command)
     local info = string.format("belong to `%s`", vim.fn.fnamemodify(path, ":t"))
     vim.system(
-      { "sh", "-c", "cat /usr/share/dict/words | fzf --filter '" .. prefix .. "' | head -n 100" },
+      { "sh", "-c", "cat /usr/share/dict/words | fzf --filter '" .. prefix .. "' | head -n 5" },
       { text = true },
       function(result)
         local output = vim.split(result.stdout or "", "\n")
